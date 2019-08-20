@@ -70,6 +70,7 @@ public class MultipleTimeServer implements Runnable {
         if(selector!=null){
             //多路复用器关闭后，所有注册在上面的Channel和Pipe等资源都会被自动去掉注册并关闭
             IOUtils.closeQuietly(selector);
+            NioTimeServer.latch.countDown();
         }
     }
 
