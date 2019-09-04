@@ -11,6 +11,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
  * 的引用供将来使用，因为这些引用都将会失效
  * **/
 public class ClientChannelHandler extends SimpleChannelInboundHandler {
+
+    private int count=0;
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
         //若服务端是以ButeBuf发送信息的话，客户端接收到的也是ByteBuf类型的
@@ -18,16 +21,18 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler {
             ByteBuf readByte=(ByteBuf)o;
             byte[] bytes=new byte[readByte.readableBytes()];
             readByte.readBytes(bytes);
-            System.out.println("netty客户端接收到的消息："+new String(bytes));
+            System.out.println("netty客户端接收到第"+(++count)+"的消息："+new String(bytes));
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        byte[] send="太君托我给您带句话".getBytes();
-        ByteBuf sendMsg= Unpooled.buffer(send.length);
-        sendMsg.writeBytes(send);
-        ctx.writeAndFlush(sendMsg);
+        byte[] send="is my answer correct".getBytes();
+        for (int i = 0; i < 1000; i++) {
+            ByteBuf sendMsg= Unpooled.buffer(send.length);
+            sendMsg.writeBytes(send);
+            ctx.writeAndFlush(sendMsg);
+        }
     }
 
     @Override
