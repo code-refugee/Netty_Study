@@ -1,6 +1,8 @@
 # Netty_Study<br>
 记录学习Netty的点点滴滴<br>
 
+***注意在讨论IO时，一定要严格区分网络IO和磁盘文件IO，IO BLOCK是针对网络IO而言的***<br>
+
 ##同步阻塞式I/O<br>
 
 最常见的就是我们使用*Socket*创建客户端与服务端，我们通常会在
@@ -39,3 +41,24 @@ __问题：__ 当客户并发访问量增加后，服务端的线程个数和客
 多次连续超时读到空数据的话，则可以断开。<br>
 
 ##NIO（非阻塞I/O）<br>
+NIO是指将IO模式设为“Non-Blocking”模式<br>
+``socketChannel.configureBlocking(false);``<br>
+在NIO模式下，如果调用read，如果发现数据没有到达，它是不会傻傻的等在那里，而是会去处理其它请求
+过一会再来询问这里有没有数据。但这样做会有一个问题，如果这个“过一会”的时间设置太短，就会造成
+过于频繁的重试，干耗CPU，时间设置太长又会加大程序响应延迟。<br>
+通常我们NIO是与IO多路复用组合起来使用的。IO多路复用是这么一种机制：程序注册一组socket文件描述
+符给操作系统，表示“我要监视这些fd是否有IO事件发生，有了就告诉程序处理”。它是一口气告诉程序，
+哪些数据到了，而不再是一个一个去问。<br>
+``socketChannel.register(selector, SelectionKey.OP_ACCEPT);``<br>
+NIO和IO多路复用是两个相对独立的事情。NIO仅仅是指IO API总是能立刻返回，不会被Blocking；而IO多路
+复用仅仅是操作系统提供的一种便利的通知机制<br>
+
+##AIO（异步非阻塞I/O）<br>
+由JDK底层的线程池负责回调并驱动读写操作，我们不需要像NIO编程那样创建一个独立的I/O线程来处理读写
+操作
+
+##NETTY<br>
+
+
+##参考文献：<br>
+[聊聊BIO，NIO和AIO](https://www.jianshu.com/p/ef418ccf2f7d)<br>
